@@ -1,69 +1,106 @@
-**Breast Cancer Detection using SVM and KNN: Comprehensive Report**
+# Breast Cancer Detection using SVM and KNN
 
-**Introduction:**
+Breast cancer is a significant health concern worldwide, emphasizing the need for early detection and accurate diagnosis. This project focuses on developing a breast cancer detection model using two powerful machine learning algorithms: Support Vector Machine (SVM) and k-Nearest Neighbors (KNN). The dataset used is sourced from the UCI Machine Learning Repository, containing various attributes associated with breast cancer tumors.
 
-Breast cancer is a formidable global health challenge, impacting millions of lives. Timely detection and accurate diagnosis play a pivotal role in improving patient outcomes. In this comprehensive report, we delve into the development of a breast cancer detection model utilizing two powerful algorithms: Support Vector Machine (SVM) and k-Nearest Neighbors (KNN). The dataset employed for training and testing is sourced from the UCI Machine Learning Repository, reflecting various attributes associated with breast cancer tumors.
+## Steps Followed
 
-**Steps Followed:**
+### 1. Data Preprocessing
 
-1. **Data Preprocessing:**
-   
-   The dataset, initially loaded into a pandas DataFrame, revealed missing values represented as '?' in the 'bare_nucleoli' column. Handling missing data is crucial for model performance; hence, we replaced these values with the median of the column. Furthermore, we converted the data type of the 'bare_nucleoli' column to 'int64' for consistency.
+```python
+import pandas as pd
+import numpy as np
 
-2. **Exploratory Data Analysis (EDA):**
-   
-   Understanding the dataset is a critical step in building effective machine learning models. Descriptive statistics and visualizations were employed to gain insights into the dataset's characteristics.
-   
-   Histograms and box plots provided a glimpse into the distribution of individual features. The correlation matrix and pair plots facilitated the exploration of relationships between different attributes, shedding light on potential patterns and correlations.
+# Load the dataset
+data = pd.read_csv("breastCancer.csv")
 
-3. **Building the Model:**
-   
-   With the dataset prepared, it was divided into training and testing sets using the `train_test_split` method. Two powerful classifiers, namely K-Nearest Neighbors (KNN) and Support Vector Machine (SVM), were selected for model development.
-   
-   - **K-Nearest Neighbors (KNN):**
-     
-     KNN is a non-parametric algorithm that classifies a data point based on the majority class of its k-nearest neighbors. The KNN model was trained using the training set.
-   
-   - **Support Vector Machine (SVM):**
-     
-     SVM is a versatile algorithm suitable for both classification and regression tasks. It works by finding the hyperplane that best separates classes in a high-dimensional space. The SVM model was trained using the training set.
+# Handling missing values represented as '?'
+df = data.replace("?", np.nan)
+df['bare_nucleoli'] = df['bare_nucleoli'].astype('float64')
+df['bare_nucleoli'] = df['bare_nucleoli'].fillna(df['bare_nucleoli'].median())
+```
 
-4. **Model Evaluation:**
-   
-   Evaluation is a crucial step to assess the performance and reliability of the models. Both the KNN and SVM models were evaluated using the test set, and predictions were generated.
+### 2. Exploratory Data Analysis (EDA)
 
-   - **Classification Reports:**
-     
-     Detailed classification reports were generated to provide insights into the precision, recall, and F1-score for each class (benign and malignant). These metrics offer a comprehensive view of the models' performance.
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-   - **Confusion Matrices:**
-     
-     Confusion matrices were created to visually represent the models' performance, showcasing correct and incorrect predictions.
+# Descriptive statistics
+df.describe().T
 
-5. **Results and Conclusion:**
-   
-   The results from both the KNN and SVM models demonstrated remarkable accuracy in breast cancer detection, exceeding 98%. The classification reports underscored high precision, recall, and F1-score for both benign and malignant classes. The confusion matrices provided a visual representation of the models' effectiveness in making accurate predictions.
+# Visualizations
+sns.pairplot(df, diag_kind='kde')
+plt.show()
 
-**Source:**
+# Correlation matrix heatmap
+plt.figure(figsize=(12, 10))
+sns.heatmap(df.corr(), annot=True, cmap='coolwarm', vmax=1, vmin=-1)
+plt.title("Correlation between attributes")
+plt.show()
+```
+
+### 3. Building the Model
+
+```python
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+
+# Split dataset into features (X) and target variable (y)
+x = df.drop('class', axis=1)
+y = df['class']
+
+# Split the data into training and testing sets
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
+
+# K-Nearest Neighbors (KNN)
+KNN = KNeighborsClassifier(n_neighbors=5, weights='distance')
+KNN.fit(x_train, y_train)
+
+# Support Vector Machine (SVM)
+svc = SVC()
+svc.fit(x_train, y_train)
+```
+
+### 4. Model Evaluation
+
+```python
+from sklearn.metrics import classification_report, confusion_matrix
+import seaborn as sns
+
+# KNN predictions and classification report
+KNN_predict = KNN.predict(x_test)
+print("KNN CLASSIFICATION REPORT")
+print(classification_report(y_test, KNN_predict))
+
+# Confusion Matrix for KNN
+cm_knn = confusion_matrix(y_test, KNN_predict)
+sns.heatmap(cm_knn, annot=True, fmt="d", cmap="Blues", xticklabels=['Predict 2', 'Predict 4'], yticklabels=['Actual 2', 'Actual 4'])
+plt.show()
+
+# SVM predictions and classification report
+svc_predict = svc.predict(x_test)
+print("SVC CLASSIFICATION REPORT")
+print(classification_report(y_test, svc_predict))
+
+# Confusion Matrix for SVM
+cm_svm = confusion_matrix(y_test, svc_predict)
+sns.heatmap(cm_svm, annot=True, fmt="d", cmap="Greens", xticklabels=['Predict 2', 'Predict 4'], yticklabels=['Actual 2', 'Actual 4'])
+plt.show()
+```
+
+## Source
 
 The dataset utilized in this project is obtained from the UCI Machine Learning Repository, a reputable source for machine learning datasets. The implementation of machine learning models and data exploration heavily relied on popular Python libraries such as pandas, numpy, seaborn, scikit-learn, and matplotlib.
 
-**Future Work:**
+## Future Work
 
-While our current models showcase promising results, there is room for further refinement and exploration:
+- **Hyperparameter Tuning:**
+  Fine-tuning the hyperparameters of both the KNN and SVM models could potentially enhance their performance.
 
-   - **Hyperparameter Tuning:**
-     
-     Fine-tuning the hyperparameters of both the KNN and SVM models could potentially enhance their performance.
+- **Additional Algorithms:**
+  Exploring alternative machine learning algorithms and ensemble methods for comparison could provide a more comprehensive understanding of the dataset.
 
-   - **Additional Algorithms:**
-     
-     Exploring alternative machine learning algorithms and ensemble methods for comparison could provide a more comprehensive understanding of the dataset.
+## Conclusion
 
-In summary, this project underscores the application of machine learning techniques for breast cancer detection, emphasizing their potential contributions to medical research and healthcare. The combination of rigorous data preprocessing, exploratory data analysis, and model development has laid the foundation for accurate and reliable breast cancer detection.
-
-**Conclusion:**
-
-Breast cancer detection is a critical aspect of healthcare, and machine learning models offer a promising avenue for accurate and timely diagnosis. The SVM and KNN models developed in this project showcase high accuracy and robust performance, demonstrating their potential as valuable tools in the fight against breast cancer.
-
-This project not only contributes to the field of medical research but also highlights the significance of leveraging machine learning for early disease detection. As technology continues to advance, the synergy between data science and healthcare holds immense potential for improving patient outcomes and advancing our understanding of complex diseases.
+This project showcases the application of machine learning techniques for breast cancer detection, emphasizing their potential contributions to medical research and healthcare. The combination of rigorous data preprocessing, exploratory data analysis, and model development has laid the foundation for accurate and reliable breast cancer detection. The presented code snippets provide a practical guide for implementing and evaluating these models.
